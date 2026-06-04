@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1",
+  "repo": "wave-av/create-wave-app",
+  "version": "0.2.0",
+  "lifecycle": "beta",
+  "planeLayer": null,
+  "foundationPin": "v1",
+  "maintainers": [{ "team": "sdk" }],
+  "exposes": {
+    "cli": [{ "binary": "create-wave-app" }]
+  },
+  "consumes": {
+    "foundationFrameworks": ["frameworks/platform-registry"]
+  },
+  "tags": ["scaffolder", "public", "npm-init"]
+}
