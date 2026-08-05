@@ -36,7 +36,7 @@ npx @wave-av/create-app "Sample Desk" --template electron \
 Then:
 
 ```bash
-cd my-stream-bot
+cd <project-name>
 npm install
 npm run dev
 ```
