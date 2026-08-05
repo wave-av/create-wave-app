@@ -27,7 +27,7 @@ npx @wave-av/create-app my-agent --template mastra-agent
 Then:
 
 ```bash
-cd my-stream-bot
+cd <project-name>
 npm install
 npm run dev
 ```
