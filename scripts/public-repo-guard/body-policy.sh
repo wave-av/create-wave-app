@@ -60,11 +60,25 @@ check() {
   # Filter with rg, not grep: BSD/macOS grep has no -P, so a `grep -P` allowlist
   # silently errors out locally while working on GNU/CI — the gate would then
   # disagree with itself depending on where it ran. rg is already required above.
-  local matches
+  #
+  # The filters fail closed too. `rg -v` exits 1 when NO line survives (every hit
+  # was allowlisted) — that is a clean pass, not an error. But exit >= 2 means the
+  # filter itself broke, and treating that as "no matches" would report a clean
+  # body on top of a primary scan that FOUND hits — a fail-open path inside the
+  # one gate whose entire value is failing closed.
+  local matches frc
   matches="$(printf '%s' "$raw" \
-    | rg -vN -- 'guard:allow[[:space:]]+[^[:space:]]' || true)"
+    | rg -vN -- 'guard:allow[[:space:]]+[^[:space:]]')"; frc=$?
+  if (( frc >= 2 )); then
+    echo "::error title=public-repo-guard ($name)::ripgrep failed (exit $frc) filtering guard:allow lines for rule '$name' — failing closed."
+    exit 2
+  fi
   if [[ "$mention" == "mention-exempt" && -n "$matches" ]]; then
-    matches="$(printf '%s' "$matches" | rg -vNiP -- "$ABOUT_THE_CONTROL" || true)"
+    matches="$(printf '%s' "$matches" | rg -vNiP -- "$ABOUT_THE_CONTROL")"; frc=$?
+    if (( frc >= 2 )); then
+      echo "::error title=public-repo-guard ($name)::ripgrep failed (exit $frc) filtering mention-exempt lines for rule '$name' — failing closed."
+      exit 2
+    fi
   fi
   [[ -z "$matches" ]] && return 0
   local count; count="$(printf '%s\n' "$matches" | grep -c '')"

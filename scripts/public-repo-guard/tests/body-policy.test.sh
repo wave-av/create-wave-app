@@ -121,6 +121,22 @@ for case in "no argument at all::" "nonexistent path::$TMP/does-not-exist.txt"; 
   fi
 done
 
+# Regression: the allowlist filter passes used `|| true`, so a filter-stage rg
+# failure emptied the match list and reported a CLEAN body on top of a primary
+# scan that FOUND hits. The shim rg delegates every call except the inverted-match
+# filter invocations (-vN / -vNiP), which it fails — exactly the fail-open path.
+REAL_RG="$(command -v rg)"
+mkdir -p "$TMP/shim"
+printf '#!/usr/bin/env bash\ncase "$1" in -v*) exit 2 ;; esac\nexec %q "$@"\n' "$REAL_RG" > "$TMP/shim/rg"
+chmod +x "$TMP/shim/rg"
+printf '%s\n' "The failing job had ${AKID_FIXTURE} configured." > "$TMP/body.txt"
+PATH="$TMP/shim:$PATH" bash "$SCRIPT" "$TMP/body.txt" >/dev/null 2>&1; rc=$?
+if [[ "$rc" == 2 ]]; then
+  PASS=$((PASS+1)); printf '  ok   allowlist filter failure → exit 2 (fails closed)\n'
+else
+  FAIL=$((FAIL+1)); printf '  FAIL allowlist filter failure — want exit 2, got %s\n' "$rc"
+fi
+
 echo "  ---"
 if (( FAIL > 0 )); then
   echo "  $PASS passed, $FAIL FAILED"; exit 1
