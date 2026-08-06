@@ -56,6 +56,14 @@ expect 1 'operator home path' \
   'Repro: run it from /Users/someoperator/Documents/notes and it fails.'  # enforce-ignore (fixture)
 expect 1 'internal-only marker' \
   'Attaching the internal-only rollout plan for context.'
+# Regression: the alternation was case-exact, so the most common shapes of a real
+# paste — capitalized or title-cased markers — sailed through unflagged.
+expect 1 'internal-only marker, SCREAMING CASE' \
+  'INTERNAL-ONLY: rollout plan attached.'
+expect 1 'internal-only marker, title case' \
+  'Attaching the Internal-only rollout plan.'
+expect 1 'do-not-share marker, sentence case' \
+  'Do not share outside the team.'
 # Assembled at run time rather than written as a literal: a fixture that LOOKS like
 # a live AWS key trips this repo's own pre-commit secret scanners (it did, on the
 # first draft). Splitting the prefix keeps the fixture exercising the real regex
@@ -105,6 +113,19 @@ expect 0 'marker MENTIONED in smart quotes' \
   'Blocks operator home paths and “internal-only” text.'
 expect 1 'marker USED unquoted still blocks' \
   'Attaching the internal-only rollout plan; do not share outside the team.'
+
+# --- unconfigured private-repo rule is skipped LOUDLY --------------------------
+# With GUARD_PRIVATE_REPOS unset the rule cannot run (the names live in an org
+# variable, never in this public file) — that is a legitimate pass, but it must
+# announce itself: a silent skip is indistinguishable from full coverage in the
+# log, and this is the highest-value rule.
+printf '%s\n' 'Flip is live: WAVE_VIEWPORT_LEASE_SECRET is bound on wave-gateway now.' > "$TMP/body.txt"
+out="$(env -u GUARD_PRIVATE_REPOS bash "$SCRIPT" "$TMP/body.txt" 2>&1)"; rc=$?
+if [[ "$rc" == 0 ]] && printf '%s' "$out" | grep -qF 'private-repo-ops rule SKIPPED'; then
+  PASS=$((PASS+1)); printf '  ok   unset GUARD_PRIVATE_REPOS → pass, skip announced\n'
+else
+  FAIL=$((FAIL+1)); printf '  FAIL unset GUARD_PRIVATE_REPOS — want exit 0 + visible skip notice, got exit %s\n%s\n' "$rc" "$out"
+fi
 
 # --- fail closed --------------------------------------------------------------
 # Invoked directly, not through expect(): expect() always materializes a file, so

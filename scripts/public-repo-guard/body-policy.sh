@@ -124,7 +124,12 @@ check BLOCK abs-user-path    '/(Users|home)/(?!runner/)[a-z][a-z0-9._-]+/'    'O
 # A quoted marker is also a trivial bypass, and that is an accepted trade. The
 # threat here is the ACCIDENTAL paste; a deliberate evader has easier routes, and
 # `guard:allow <reason>` already exists as the honest, visible one.
-check BLOCK internal-marker  '(?<![“"'"'"'`])\b(internal[- ]only|do\s+not\s+(share|publish|distribute)|for\s+internal\s+use)\b(?![”"'"'"'`])' 'Text self-identifies as not-for-public' mention-exempt
+#
+# The alternation is (?i:) — pasted internal material is typically capitalized or
+# title-cased ("INTERNAL-ONLY:", "Do Not Share"), and a case-exact match let all
+# of those through. Scoped to the alternation so the quote lookarounds are
+# untouched; same reasoning as the (?i:) prose alternatives in OPS_DETAIL below.
+check BLOCK internal-marker  '(?<![“"'"'"'`])\b(?i:internal[- ]only|do\s+not\s+(?:share|publish|distribute)|for\s+internal\s+use)\b(?![”"'"'"'`])' 'Text self-identifies as not-for-public' mention-exempt
 
 # --- Private repo + operational detail (PROXIMITY, not bare name) ------------
 # The BODY profile deliberately DIVERGES from the FILE profile here, and the
@@ -166,7 +171,15 @@ if [[ -n "${GUARD_PRIVATE_REPOS:-}" ]]; then
       "\\b(?i:${_ALT})\\b[^\\n]{0,140}?\\b${OPS_DETAIL}|${OPS_DETAIL}[^\\n]{0,140}?\\b(?i:${_ALT})\\b" \
       'A private WAVE repo named alongside internal operational detail (credential name, secret binding, or secret count) — the wiring topology is not public' \
       mention-exempt
+  else
+    echo "::warning title=public-repo-guard (private-repo-ops)::GUARD_PRIVATE_REPOS is set but contains no names — private-repo-ops rule SKIPPED."
   fi
+else
+  # Announce the skip rather than silently narrowing coverage: a run whose log
+  # says nothing looks identical to a run that scanned everything, and this is
+  # the highest-value rule. The pass is still honest — the rule is unconfigured,
+  # not broken — but the log must show it.
+  echo "::warning title=public-repo-guard (private-repo-ops)::GUARD_PRIVATE_REPOS is not set — private-repo-ops rule SKIPPED (no configuration)."
 fi
 
 if (( VIOLATIONS > 0 )); then
