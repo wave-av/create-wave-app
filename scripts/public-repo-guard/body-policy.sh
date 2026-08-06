@@ -149,7 +149,16 @@ check BLOCK abs-user-path    '/(Users|home)/(?!runner/)[a-z][a-z0-9._-]+/'    'O
 # title-cased ("INTERNAL-ONLY:", "Do Not Share"), and a case-exact match let all
 # of those through. Scoped to the alternation so the quote lookarounds are
 # untouched; same reasoning as the (?i:) prose alternatives in OPS_DETAIL below.
-check BLOCK internal-marker  '(?<![“"'"'"'`])\b(?i:internal[- ]only|do\s+not\s+(?:share|publish|distribute)|for\s+internal\s+use)\b(?![”"'"'"'`])' 'Text self-identifies as not-for-public' mention-exempt
+#
+# The do-not-share/publish/distribute alternative is NARROWER than the rest.
+# Unlike the credential rules it has no artifact requirement — the phrase alone
+# is the violation — and "do not publish to npm until the release PR lands" is
+# ordinary engineering prose. An unqualified match hard-blocked everyday PR
+# bodies: the self-referential trap again. So it fires only in the shapes a
+# pasted confidentiality marker actually takes: ALL CAPS ("DO NOT DISTRIBUTE"),
+# Title Case ("Do Not Share"), a header colon ("do not share: ..."), or an
+# audience qualifier ("do not share outside/externally/publicly/beyond ...").
+check BLOCK internal-marker  '(?<![“"'"'"'`])\b(?:(?i:internal[- ]only|for\s+internal\s+use)|DO\s+NOT\s+(?:SHARE|PUBLISH|DISTRIBUTE)|Do\s+Not\s+(?:Share|Publish|Distribute)|(?i:do\s+not\s+(?:share|publish|distribute))(?=\s*:|\s+(?i:outside|extern|publicl|beyond)))\b(?![”"'"'"'`])' 'Text self-identifies as not-for-public' mention-exempt
 
 # --- Private repo + operational detail (PROXIMITY, not bare name) ------------
 # The BODY profile deliberately DIVERGES from the FILE profile here, and the

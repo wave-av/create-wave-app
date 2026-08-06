@@ -73,8 +73,16 @@ expect 1 'internal-only marker, SCREAMING CASE' \
   'INTERNAL-ONLY: rollout plan attached.'
 expect 1 'internal-only marker, title case' \
   'Attaching the Internal-only rollout plan.'
-expect 1 'do-not-share marker, sentence case' \
+expect 1 'do-not-share marker with audience qualifier' \
   'Do not share outside the team.'
+# The do-not-share alternative fires on marker SHAPES, not the bare phrase —
+# see the block fixtures here and the everyday-prose negatives below.
+expect 1 'do-not-share marker, ALL CAPS' \
+  'The original doc is stamped DO NOT DISTRIBUTE at the top.'
+expect 1 'do-not-share marker, title case' \
+  'This deck is Do Not Share until launch.'
+expect 1 'do-not-share marker, header colon form' \
+  'do not share: contains fleet rollout details.'
 # Assembled at run time rather than written as a literal: a fixture that LOOKS like
 # a live AWS key trips this repo's own pre-commit secret scanners (it did, on the
 # first draft). Splitting the prefix keeps the fixture exercising the real regex
@@ -118,6 +126,13 @@ expect 0 'explicit guard:allow with a reason' \
   'Example for the docs: fixture-alpha holds EXAMPLE_SECRET — guard:allow documented-example'
 expect 0 'ordinary clean body' \
   'Bumps the draft revision and regenerates the fixtures. No behaviour change.'
+# Regression: the do-not-share alternative matched any casing with no qualifier,
+# so ordinary release choreography in a PR body hard-blocked the merge box —
+# the exact "fires on legitimate text, gets switched off" failure mode.
+expect 0 'everyday do-not-publish prose is not a marker' \
+  'do not publish to npm until the release PR lands.'
+expect 0 'sentence-start do-not-distribute prose is not a marker' \
+  'Do not distribute the build until QA signs off.'
 # Regression: the first CI run of this job failed on its own PR, because a review
 # bot edited the body to summarize the change and quoted the marker verbatim.
 expect 0 'marker MENTIONED in straight quotes is a description' \
