@@ -15,7 +15,11 @@ trap 'rm -rf "$TMP"' EXIT
 
 # The names the real gate is configured with come from an org variable; the tests
 # pin their own so they are hermetic and do not depend on CI configuration.
-export GUARD_PRIVATE_REPOS="wave-gateway, wave-transports, agent-money"
+# These MUST be synthetic. This file is public and lives in a directory both tree
+# scanners exempt (.gitleaks.toml path allowlist and content-policy.sh's own-dir
+# glob), so a REAL private repo name written here would be published with nothing
+# able to catch it — the exact leak this gate exists to stop.
+export GUARD_PRIVATE_REPOS="fixture-alpha, fixture-beta, fixture-gamma"
 
 PASS=0; FAIL=0
 
@@ -39,26 +43,26 @@ echo "body-policy fixtures"
 
 # --- must BLOCK ---------------------------------------------------------------
 expect 1 'private repo + credential name' \
-  'Flip is live: WAVE_VIEWPORT_LEASE_SECRET is bound on wave-gateway now.'
+  'Flip is live: WAVE_VIEWPORT_LEASE_SECRET is bound on fixture-alpha now.'
 expect 1 'private repo + credential name, reverse order' \
-  'The MOQ_JOIN_SECRET was added; wave-transports picks it up on deploy.'
+  'The MOQ_JOIN_SECRET was added; fixture-beta picks it up on deploy.'
 # Regression: with `[A-Z][A-Z0-9]*_` the \b could only anchor at the first
 # segment, so any credential name with more than one underscore slipped through.
 expect 1 'private repo + multi-segment credential name' \
-  'wave-gateway now reads STRIPE_API_KEY at boot.'
+  'fixture-alpha now reads STRIPE_API_KEY at boot.'
 expect 1 'private repo + capitalized secret-binding prose' \
-  'Secret is bound on wave-gateway per the runbook.'
+  'Secret is bound on fixture-alpha per the runbook.'
 expect 1 'private repo + secret count' \
-  'wave-gateway went from 74 secrets to 75 after this change.'
+  'fixture-alpha went from 74 secrets to 75 after this change.'
 expect 1 'private repo + service binding' \
-  'This adds a service binding from the worker to agent-money for settlement.'
+  'This adds a service binding from the worker to fixture-gamma for settlement.'
 # Regression: the proximity window was line-scoped ([^\n]), so a name on one
 # markdown bullet and the credential detail on the next — the ORDINARY shape of
 # a PR body, not an evasion — never fired. The window now crosses newlines.
 expect 1 'private repo + credential name split across adjacent lines' \
-  $'Deploy notes:\n- repo: wave-gateway\n- WAVE_VIEWPORT_LEASE_SECRET is bound there now.'
+  $'Deploy notes:\n- repo: fixture-alpha\n- WAVE_VIEWPORT_LEASE_SECRET is bound there now.'
 expect 1 'credential detail with the private repo on the next line' \
-  $'MOQ_JOIN_SECRET was rotated today.\nwave-transports picks it up on the next deploy.'
+  $'MOQ_JOIN_SECRET was rotated today.\nfixture-beta picks it up on the next deploy.'
 expect 1 'operator home path' \
   'Repro: run it from /Users/someoperator/Documents/notes and it fails.'  # enforce-ignore (fixture)
 expect 1 'internal-only marker' \
@@ -87,21 +91,21 @@ expect 1 'control words do not excuse a credential artifact' \
 
 # --- must PASS (precision — these keep the gate deployable) -------------------
 expect 0 'bare private-repo cross-reference' \
-  'This is the companion change to wave-transports#260; merge that one first.'
+  'This is the companion change to fixture-beta#260; merge that one first.'
 expect 0 'two private repos, no operational detail' \
-  'Both wave-gateway and wave-transports will need a follow-up for this.'
+  'Both fixture-alpha and fixture-beta will need a follow-up for this.'
 expect 0 'credential NAME with no private repo nearby' \
   'The handler now reads SOME_API_TOKEN from the environment instead of a literal.'
 # The cross-line window is still a WINDOW: a repo name and a credential name in
 # the same body but more than 140 characters apart stay unrelated prose.
 expect 0 'private repo and credential NAME far apart across lines' \
-  $'wave-gateway is the companion repo for this change.\nUnrelated: the long section below documents the retry strategy for the fetch layer in detail, none of which involves any secret wiring at all.\nThe handler now reads SOME_API_TOKEN from the environment instead of a literal.'
+  $'fixture-alpha is the companion repo for this change.\nUnrelated: the long section below documents the retry strategy for the fetch layer in detail, none of which involves any secret wiring at all.\nThe handler now reads SOME_API_TOKEN from the environment instead of a literal.'
 # Regression: a pattern-wide (?i) made the SCREAMING_CASE credential-name
 # alternative match ordinary lowercase words, blocking everyday prose.
 expect 0 'lowercase snake_case word near a private repo is not a credential' \
-  'Refactor wave-gateway so the cache_key is computed once.'
+  'Refactor fixture-alpha so the cache_key is computed once.'
 expect 0 'lowercase api_token near a private repo is not a credential' \
-  'This affects wave-transports and the api_token handling.'
+  'This affects fixture-beta and the api_token handling.'
 expect 0 'public runner path is not an operator path' \
   'CI checks out to /home/runner/work/repo/repo before the scan runs.'  # enforce-ignore (fixture)
 expect 0 'talking about the control' \
@@ -109,9 +113,9 @@ expect 0 'talking about the control' \
 # The mention-exempt half of the same trade: a control-discussion line that names
 # a private repo next to a credential NAME (no actual secret) stays allowed.
 expect 0 'control discussion naming repo + credential NAME is still exempt' \
-  'content-policy blocks wave-gateway next to WAVE_API_SECRET; that pairing is the point.'
+  'content-policy blocks fixture-alpha next to WAVE_API_SECRET; that pairing is the point.'
 expect 0 'explicit guard:allow with a reason' \
-  'Example for the docs: wave-gateway holds EXAMPLE_SECRET — guard:allow documented-example'
+  'Example for the docs: fixture-alpha holds EXAMPLE_SECRET — guard:allow documented-example'
 expect 0 'ordinary clean body' \
   'Bumps the draft revision and regenerates the fixtures. No behaviour change.'
 # Regression: the first CI run of this job failed on its own PR, because a review
@@ -130,7 +134,7 @@ expect 1 'marker USED unquoted still blocks' \
 # variable, never in this public file) — that is a legitimate pass, but it must
 # announce itself: a silent skip is indistinguishable from full coverage in the
 # log, and this is the highest-value rule.
-printf '%s\n' 'Flip is live: WAVE_VIEWPORT_LEASE_SECRET is bound on wave-gateway now.' > "$TMP/body.txt"
+printf '%s\n' 'Flip is live: WAVE_VIEWPORT_LEASE_SECRET is bound on fixture-alpha now.' > "$TMP/body.txt"
 out="$(env -u GUARD_PRIVATE_REPOS bash "$SCRIPT" "$TMP/body.txt" 2>&1)"; rc=$?
 if [[ "$rc" == 0 ]] && printf '%s' "$out" | grep -qF 'private-repo-ops rule SKIPPED'; then
   PASS=$((PASS+1)); printf '  ok   unset GUARD_PRIVATE_REPOS → pass, skip announced\n'

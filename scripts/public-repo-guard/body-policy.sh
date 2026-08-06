@@ -165,7 +165,7 @@ check BLOCK internal-marker  '(?<![“"'"'"'`])\b(?i:internal[- ]only|do\s+not\s
 # of what is wired to what, and it is the shape that actually leaked.
 #
 # The window crosses line breaks (rg -U, `[\s\S]` not `[^\n]`), because bodies
-# are markdown: "- repo: wave-gateway" on one bullet and the credential on the
+# are markdown: "- repo: fixture-alpha" on one bullet and the credential on the
 # next is the ORDINARY way a PR body is written, not an evasion. A line-scoped
 # window made the one leak class this gate exists for invisible to plain
 # formatting. 140 chars stays the budget whether or not a newline sits inside it.
