@@ -3,7 +3,8 @@
 #
 # Companion to content-policy.sh. That script scans the published working TREE;
 # this one scans the other half of a public repo's surface: pull-request titles
-# and bodies, issue bodies, and comment bodies. Those are equally world-readable
+# and bodies, issue bodies, comment bodies, and review bodies (submissions and
+# inline review-thread comments). Those are equally world-readable
 # and, until this script existed, were scanned by NOTHING server-side. That gap
 # was not theoretical — a PR was merged whose wrangler.toml was correctly BLOCKED
 # for naming a private repo while the PR body named the same repo, with more
@@ -37,22 +38,41 @@ VIOLATIONS=0
 # below). Naming the gate must never excuse a concrete artifact like a live key.
 ABOUT_THE_CONTROL='(public-repo-guard|body-policy|content-policy|public-github-write-gate|\bNDA\s+(gate|guard|policy|denylist|sweep|scan|hook)\b|\bno\s+NDA\b|responsib\w*\s+disclos|SECURITY\.md)'
 
-# check <BLOCK|WARN> <name> <regex> <why> [mention-exempt]
+# check <BLOCK|WARN> <name> <regex> <why> [mention-exempt] [multiline]
 #
-# The optional 5th argument scopes the ABOUT-THE-CONTROL allowlist. Only rules
-# whose matches are genuinely ambiguous between USING a phrase and TALKING ABOUT
+# Optional tags after <why>:
+#
+# `mention-exempt` scopes the ABOUT-THE-CONTROL allowlist. Only rules whose
+# matches are genuinely ambiguous between USING a phrase and TALKING ABOUT
 # the gate pass `mention-exempt`. Artifact rules (credential formats, infra
 # identifiers) must NOT: a real key, account ID, fleet IP, or operator path is a
 # leak no matter what else the line says, and a global exemption would let
 # "body-policy missed sk_live_…" walk a live secret straight past the gate.
 # `guard:allow` stays global — it is the deliberate, visible escape hatch.
+#
+# `multiline` scans with rg -U so the regex may cross line boundaries. Line
+# numbers still refer to the original body: rg prints every line a match spans
+# with its own number. The allowlist filters stay per-line, which is the
+# conservative reading — a cross-line match is excused only for the lines that
+# individually carry `guard:allow` or an ABOUT-THE-CONTROL mention, so a filter
+# can never swallow more than the line it recognizes.
 check() {
-  local sev="$1" name="$2" re="$3" why="$4" mention="${5:-}"
+  local sev="$1" name="$2" re="$3" why="$4"; shift 4
+  local mention='' multiline='' tag
+  for tag in "$@"; do
+    case "$tag" in
+      mention-exempt) mention=1 ;;
+      multiline)      multiline=1 ;;
+      *) echo "::error::body-policy: internal bug, unknown tag '$tag' for rule '$name'"; exit 2 ;;
+    esac
+  done
   [[ -z "$re" ]] && { echo "::error::body-policy: internal bug — empty regex for rule '$name'"; exit 2; }
   # rg exit: 0=match, 1=no match, >=2=real error → FAIL CLOSED. A gate that passes
   # because its scanner broke is worse than no gate: it reports success.
   local raw rc
-  raw="$(rg -nP --no-filename -- "$re" "$FILE" 2>/dev/null)"; rc=$?
+  local rg_flags=(-nP --no-filename)
+  [[ -n "$multiline" ]] && rg_flags+=(-U)
+  raw="$(rg "${rg_flags[@]}" -- "$re" "$FILE" 2>/dev/null)"; rc=$?
   if (( rc >= 2 )); then
     echo "::error title=public-repo-guard ($name)::ripgrep failed (exit $rc) scanning rule '$name' — failing closed."
     exit 2
@@ -73,7 +93,7 @@ check() {
     echo "::error title=public-repo-guard ($name)::ripgrep failed (exit $frc) filtering guard:allow lines for rule '$name' — failing closed."
     exit 2
   fi
-  if [[ "$mention" == "mention-exempt" && -n "$matches" ]]; then
+  if [[ -n "$mention" && -n "$matches" ]]; then
     matches="$(printf '%s' "$matches" | rg -vNiP -- "$ABOUT_THE_CONTROL")"; frc=$?
     if (( frc >= 2 )); then
       echo "::error title=public-repo-guard ($name)::ripgrep failed (exit $frc) filtering mention-exempt lines for rule '$name' — failing closed."
@@ -144,6 +164,12 @@ check BLOCK internal-marker  '(?<![“"'"'"'`])\b(?i:internal[- ]only|do\s+not\s
 # secret-binding verb, a service binding, or a secret COUNT. That is the topology
 # of what is wired to what, and it is the shape that actually leaked.
 #
+# The window crosses line breaks (rg -U, `[\s\S]` not `[^\n]`), because bodies
+# are markdown: "- repo: wave-gateway" on one bullet and the credential on the
+# next is the ORDINARY way a PR body is written, not an evasion. A line-scoped
+# window made the one leak class this gate exists for invisible to plain
+# formatting. 140 chars stays the budget whether or not a newline sits inside it.
+#
 # Names are NOT hardcoded (this file is public); CI injects them via the
 # GUARD_PRIVATE_REPOS variable. Unset locally → this check is skipped.
 if [[ -n "${GUARD_PRIVATE_REPOS:-}" ]]; then
@@ -168,9 +194,9 @@ if [[ -n "${GUARD_PRIVATE_REPOS:-}" ]]; then
     # scoped to the repo-name alternation — a pattern-wide (?i) would defeat the
     # SCREAMING_CASE requirement in OPS_DETAIL above.
     check BLOCK private-repo-ops \
-      "\\b(?i:${_ALT})\\b[^\\n]{0,140}?\\b${OPS_DETAIL}|${OPS_DETAIL}[^\\n]{0,140}?\\b(?i:${_ALT})\\b" \
+      "\\b(?i:${_ALT})\\b[\\s\\S]{0,140}?\\b${OPS_DETAIL}|${OPS_DETAIL}[\\s\\S]{0,140}?\\b(?i:${_ALT})\\b" \
       'A private WAVE repo named alongside internal operational detail (credential name, secret binding, or secret count) — the wiring topology is not public' \
-      mention-exempt
+      mention-exempt multiline
   else
     echo "::warning title=public-repo-guard (private-repo-ops)::GUARD_PRIVATE_REPOS is set but contains no names — private-repo-ops rule SKIPPED."
   fi

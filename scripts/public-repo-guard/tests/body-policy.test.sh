@@ -52,6 +52,13 @@ expect 1 'private repo + secret count' \
   'wave-gateway went from 74 secrets to 75 after this change.'
 expect 1 'private repo + service binding' \
   'This adds a service binding from the worker to agent-money for settlement.'
+# Regression: the proximity window was line-scoped ([^\n]), so a name on one
+# markdown bullet and the credential detail on the next — the ORDINARY shape of
+# a PR body, not an evasion — never fired. The window now crosses newlines.
+expect 1 'private repo + credential name split across adjacent lines' \
+  $'Deploy notes:\n- repo: wave-gateway\n- WAVE_VIEWPORT_LEASE_SECRET is bound there now.'
+expect 1 'credential detail with the private repo on the next line' \
+  $'MOQ_JOIN_SECRET was rotated today.\nwave-transports picks it up on the next deploy.'
 expect 1 'operator home path' \
   'Repro: run it from /Users/someoperator/Documents/notes and it fails.'  # enforce-ignore (fixture)
 expect 1 'internal-only marker' \
@@ -85,6 +92,10 @@ expect 0 'two private repos, no operational detail' \
   'Both wave-gateway and wave-transports will need a follow-up for this.'
 expect 0 'credential NAME with no private repo nearby' \
   'The handler now reads SOME_API_TOKEN from the environment instead of a literal.'
+# The cross-line window is still a WINDOW: a repo name and a credential name in
+# the same body but more than 140 characters apart stay unrelated prose.
+expect 0 'private repo and credential NAME far apart across lines' \
+  $'wave-gateway is the companion repo for this change.\nUnrelated: the long section below documents the retry strategy for the fetch layer in detail, none of which involves any secret wiring at all.\nThe handler now reads SOME_API_TOKEN from the environment instead of a literal.'
 # Regression: a pattern-wide (?i) made the SCREAMING_CASE credential-name
 # alternative match ordinary lowercase words, blocking everyday prose.
 expect 0 'lowercase snake_case word near a private repo is not a credential' \
