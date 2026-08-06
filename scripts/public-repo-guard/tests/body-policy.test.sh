@@ -65,6 +65,10 @@ expect 1 'AWS access key id' \
   "The failing job had ${AKID_FIXTURE} configured."
 expect 1 'internal tailscale IP' \
   'It resolves to 100.71.4.19 from inside the fleet.'
+# Regression: ABOUT_THE_CONTROL used to apply to every rule, so naming the gate
+# on the same line as a real credential walked the secret straight through.
+expect 1 'control words do not excuse a credential artifact' \
+  "body-policy missed this in the last sweep: ${AKID_FIXTURE} was live."
 
 # --- must PASS (precision — these keep the gate deployable) -------------------
 expect 0 'bare private-repo cross-reference' \
@@ -83,6 +87,10 @@ expect 0 'public runner path is not an operator path' \
   'CI checks out to /home/runner/work/repo/repo before the scan runs.'  # enforce-ignore (fixture)
 expect 0 'talking about the control' \
   'body-policy blocks a private repo named next to a SECRET_TOKEN; that is intended.'
+# The mention-exempt half of the same trade: a control-discussion line that names
+# a private repo next to a credential NAME (no actual secret) stays allowed.
+expect 0 'control discussion naming repo + credential NAME is still exempt' \
+  'content-policy blocks wave-gateway next to WAVE_API_SECRET; that pairing is the point.'
 expect 0 'explicit guard:allow with a reason' \
   'Example for the docs: wave-gateway holds EXAMPLE_SECRET — guard:allow documented-example'
 expect 0 'ordinary clean body' \
