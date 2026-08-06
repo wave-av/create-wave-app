@@ -60,13 +60,22 @@ permissions:
 jobs:
   guard:
     name: Secrets + content policy
-    # Skips issue/comment/review events (the tree scan has nothing to say about a
-    # comment, and the org should not pay for a gitleaks run every time anyone posts
-    # one) and skips `edited` (a title or body edit does not change the tree).
+    # Runs on EVERY event that attaches a check run to a PR head SHA, including
+    # `edited` and the two review events, even though none of them change the tree.
+    # This is a security property, not waste: a job skipped by a job-level `if`
+    # still publishes a check run of the same name, GitHub counts that skip as
+    # passing, and branch protection evaluates the LATEST run of a required check
+    # name. Skipping here would let a PR whose tree scan FAILED go green again the
+    # moment anyone edits the PR body or posts an inline review comment. Re-running
+    # the scan instead is idempotent (same SHA, same verdict): red stays red.
+    #
+    # Only `issues` / `issue_comment` are skipped: those runs attach to the
+    # default-branch commit, not a PR head, so their skipped check run can never
+    # supersede a PR's required check (and the org should not pay for a gitleaks
+    # run every time anyone posts a comment on an issue).
     if: >-
-      (github.event_name == 'pull_request' && github.event.action != 'edited')
-      || github.event_name == 'push'
-      || github.event_name == 'workflow_dispatch'
+      github.event_name != 'issues'
+      && github.event_name != 'issue_comment'
     concurrency:
       group: public-repo-guard-tree-${{ github.event.pull_request.number || github.ref }}
       cancel-in-progress: true
@@ -131,10 +140,13 @@ jobs:
   # PR was blocked for naming a private repo in wrangler.toml while the very same
   # name, with more operational detail attached, sat unchallenged in its body.
   #
-  # Honest about what it can and cannot do. On a PR this PREVENTS the merge. On an
-  # issue, comment, or review the text is already public the moment it posts, so
-  # this is detection — it tells us to go redact, fast. Only the client-side
-  # pre-write hook can stop that class before publication.
+  # Honest about what it can and cannot do. On a PR a violation puts a red X on
+  # the merge box; it only hard-BLOCKS the merge once the `Body content policy`
+  # check name is added to branch protection alongside the required
+  # `Secrets + content policy` (a branch-protection change, not a workflow one).
+  # On an issue, comment, or review the text is already public the moment it
+  # posts, so this is detection: it tells us to go redact, fast. Only the
+  # client-side pre-write hook can stop that class before publication.
   body-guard:
     name: Body content policy
     if: >-
