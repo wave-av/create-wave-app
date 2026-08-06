@@ -129,7 +129,14 @@ check BLOCK private-key      '-----BEGIN [A-Z ]*PRIVATE KEY-----'            'Em
 check BLOCK cf-account-id    'account_id\s*[:=]\s*["'"'"']?[0-9a-f]{32}'      'Hardcoded Cloudflare account_id — reference the env var instead'
 check BLOCK internal-ip      '100\.(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\.[0-9]{1,3}\.[0-9]{1,3}'  'Internal Tailscale-CGNAT IP (100.64.0.0/10) — internal fleet address'
 # shellcheck disable=SC2016  # $HOME is literal guidance text
-check BLOCK abs-user-path    '/(Users|home)/(?!runner/)[a-z][a-z0-9._-]+/'    'Operator absolute home path — leaks identity and local layout'
+#
+# The lookbehind keeps this off URLs. Bodies are prose full of links, and
+# "https://docs.example.com/home/getting-started/" is a path SEGMENT, not a
+# filesystem path: in a URL the leading slash always follows a hostname or path
+# character, while a real absolute path follows whitespace, start-of-line, a
+# quote, backtick, bracket, or `=`. (file:///home/... still fires: its slash
+# follows a slash, and a file:// URL IS a local operator path.)
+check BLOCK abs-user-path    '(?<![\w.-])/(Users|home)/(?!runner/)[a-z][a-z0-9._-]+/' 'Operator absolute home path — leaks identity and local layout'
 
 # --- Self-identified internal material ---------------------------------------
 # USE vs MENTION. A body that SAYS "internal-only" is leaking; a body that QUOTES

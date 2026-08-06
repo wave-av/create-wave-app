@@ -116,6 +116,16 @@ expect 0 'lowercase api_token near a private repo is not a credential' \
   'This affects fixture-beta and the api_token handling.'
 expect 0 'public runner path is not an operator path' \
   'CI checks out to /home/runner/work/repo/repo before the scan runs.'  # enforce-ignore (fixture)
+# Regression: the rule had no notion of a URL, so a documentation link with a
+# /home/<segment>/ path segment blocked the body. In a URL the leading slash
+# always follows a hostname or path character; a real absolute path never does.
+expect 0 'URL with a /home/ path segment is not an operator path' \
+  'See https://docs.example.com/home/getting-started/ for the setup steps.'
+expect 0 'markdown link with a /Users/ path segment is not an operator path' \
+  'Documented in [the guide](https://support.example.com/Users/macos-setup/) already.'
+# The other side of the URL carve-out: file:// is a LOCAL path in URL clothing.
+expect 1 'file:// URL to an operator home path still blocks' \
+  'It renders fine from file:///Users/someoperator/Desktop/preview.html locally.'  # enforce-ignore (fixture)
 expect 0 'talking about the control' \
   'body-policy blocks a private repo named next to a SECRET_TOKEN; that is intended.'
 # The mention-exempt half of the same trade: a control-discussion line that names
