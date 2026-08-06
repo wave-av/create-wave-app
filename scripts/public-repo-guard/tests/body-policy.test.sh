@@ -42,6 +42,12 @@ expect 1 'private repo + credential name' \
   'Flip is live: WAVE_VIEWPORT_LEASE_SECRET is bound on wave-gateway now.'
 expect 1 'private repo + credential name, reverse order' \
   'The MOQ_JOIN_SECRET was added; wave-transports picks it up on deploy.'
+# Regression: with `[A-Z][A-Z0-9]*_` the \b could only anchor at the first
+# segment, so any credential name with more than one underscore slipped through.
+expect 1 'private repo + multi-segment credential name' \
+  'wave-gateway now reads STRIPE_API_KEY at boot.'
+expect 1 'private repo + capitalized secret-binding prose' \
+  'Secret is bound on wave-gateway per the runbook.'
 expect 1 'private repo + secret count' \
   'wave-gateway went from 74 secrets to 75 after this change.'
 expect 1 'private repo + service binding' \
@@ -67,6 +73,12 @@ expect 0 'two private repos, no operational detail' \
   'Both wave-gateway and wave-transports will need a follow-up for this.'
 expect 0 'credential NAME with no private repo nearby' \
   'The handler now reads SOME_API_TOKEN from the environment instead of a literal.'
+# Regression: a pattern-wide (?i) made the SCREAMING_CASE credential-name
+# alternative match ordinary lowercase words, blocking everyday prose.
+expect 0 'lowercase snake_case word near a private repo is not a credential' \
+  'Refactor wave-gateway so the cache_key is computed once.'
+expect 0 'lowercase api_token near a private repo is not a credential' \
+  'This affects wave-transports and the api_token handling.'
 expect 0 'public runner path is not an operator path' \
   'CI checks out to /home/runner/work/repo/repo before the scan runs.'  # enforce-ignore (fixture)
 expect 0 'talking about the control' \
