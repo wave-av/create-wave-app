@@ -77,8 +77,17 @@ jobs:
       github.event_name != 'issues'
       && github.event_name != 'issue_comment'
     concurrency:
+      # Grouped per PR so a new commit supersedes the scan of an outdated head —
+      # but cancellation is restricted to `synchronize`, the only PR event that
+      # changes the tree. The `edited` / review events all carry a top-level
+      # `pull_request` object, so with an unconditional `cancel-in-progress: true`
+      # every body edit and inline review comment landed in this group and killed
+      # the live tree scan, recreating the exact cancelled-run noise the per-job
+      # split above was meant to end. Same-tree events now QUEUE behind the
+      # running scan instead (GitHub keeps at most one pending run per group, so
+      # a burst of edits collapses rather than piling up).
       group: public-repo-guard-tree-${{ github.event.pull_request.number || github.ref }}
-      cancel-in-progress: true
+      cancel-in-progress: ${{ github.event.action == 'synchronize' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
