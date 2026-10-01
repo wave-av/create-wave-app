@@ -1,0 +1,27 @@
+templates/webhook-handler/src/verify.ts
+  s_13ccc7d9001218::t_b1002a589c393f 21-37
+templates/webhook-handler/README.md
+  s_13ccc7d9001218::t_fc948a2424713e 4-5
+  s_13ccc7d9001218::t_fee2fbb1a47c22 38-49,52-60,64-65
+templates/webhook-handler/src/server.ts
+  s_13ccc7d9001218::t_c82039aa59db62 6,9-10,15-16,21-25,34-44,50-57,59-60,62-69,71-75,78-104
+templates/webhook-handler/src/verify.test.ts
+  s_13ccc7d9001218::t_da3bc5d2fb48a8 4
+  s_13ccc7d9001218::t_9e74675b7efe82 29-49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "a7502ff0a5fa8ae0cd097794ead50d65cae077da",
+  "prompts": {},
+  "sessions": {
+    "s_13ccc7d9001218": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "11229abc-f617-4541-b5d7-d693c6ae4d9d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jake Fineman <jakefineman@gmail.com>"
+    }
+  }
+}
