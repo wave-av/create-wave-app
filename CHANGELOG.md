@@ -8,8 +8,9 @@ All notable changes to this project are documented here. The format is based on
 
 ## [1.1.0]
 
-The source of `@wave-av/create-app` now lives in this repository, with tests,
-and every template installs, type-checks and builds.
+The source of `@wave-av/create-app` now lives in this repository, with tests.
+Every template installs and type-checks, and the compiled templates build and
+start the file their build writes (`mastra-agent` runs from source with `tsx`).
 
 ### Fixed
 
@@ -42,4 +43,24 @@ and every template installs, type-checks and builds.
 - Requires Node 20.12 or later (`mastra-agent` needs 22.13, as Mastra does).
 - Templates ship `gitignore` and `env.example` and are renamed to
   `.gitignore` and `.env.example` on scaffold, so they survive `npm pack`.
-- Published with npm provenance from this repository.
+- Published with npm provenance from this repository. A release tag must point
+  at a commit on `main`, and the release runs the packed-tarball template check
+  and fails when `@wave-av/adk` `^1.1.0` is not on npm. The build runs on
+  `prepack`, so `npm pack` from a clean clone includes `dist/`.
+- If scaffolding fails partway, the half-made project directory is removed.
+- `webhook-handler`: refuses bodies over 256 KiB (`413`) while they stream in,
+  checks the delivery shape after the signature (`400` otherwise), routes on
+  the signed event type and refuses a disagreeing `x-wave-event-type`, and
+  logs only event types and ids (never `data` or the signed `payload_url`).
+  The README says thin payloads are not fetched and that duplicate detection
+  is recent and in memory.
+- `livekit-agent`: read-only WAVE tools by default, since anyone in the room
+  can drive the agent with your key; `WAVE_AGENT_ALLOW_ACTIONS=1` adds the rest.
+  Says that the default models need LiveKit Cloud.
+- `nextjs-supabase`: the public page no longer shows the organization id, and
+  the connection check is reused for a minute instead of running per visit.
+- `stream-monitor`: `WAVE_POLL_INTERVAL_MS` must be a whole number of at least
+  1000 ms.
+- Templates stop with a message when `.env` exists but cannot be read, instead
+  of silently running without it. `mastra-agent` disconnects MCP when its
+  start-up fails.
