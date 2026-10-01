@@ -4,6 +4,13 @@ on:
   pull_request:
   push:
     branches: [main]
+  # release.yml calls this with require-adk: true, so a release cannot skip a template.
+  workflow_call:
+    inputs:
+      require-adk:
+        description: Fail, instead of warning, when a template's @wave-av/adk range is not on npm.
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -63,12 +70,19 @@ jobs:
             test -f "app-$t/.gitignore"
           done
       - name: Install, type-check and build each template
+        env:
+          # Pull requests may land before the ADK release they need; a release may not.
+          REQUIRE_ADK: ${{ inputs.require-adk && '1' || '0' }}
         run: |
           set -euo pipefail
           cd "$RUNNER_TEMP"
           adk_ready="$(npm view '@wave-av/adk@^1.1.0' version 2>/dev/null | tail -1 || true)"
           for t in stream-monitor mastra-agent livekit-agent webhook-handler nextjs-supabase; do
             if grep -q '"@wave-av/adk"' "app-$t/package.json" && [ -z "$adk_ready" ]; then
+              if [ "$REQUIRE_ADK" = "1" ]; then
+                echo "::error title=ADK not published::$t needs @wave-av/adk ^1.1.0, which is not on npm. Publish the ADK first."
+                exit 1
+              fi
               echo "::warning title=Template not installed::$t needs @wave-av/adk ^1.1.0, which is not on npm yet. It was scaffolded and statically checked only."
               continue
             fi

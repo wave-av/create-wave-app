@@ -18,7 +18,7 @@
     "build": "tsup src/index.ts --format esm --target node20 --clean",
     "type-check": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
-    "prepublishOnly": "npm run build"
+    "prepack": "npm run build"
   },
   "keywords": [
     "wave",
