@@ -1,0 +1,26 @@
+{
+  "name": "wave-mastra-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/agent.ts",
+    "start": "tsx src/agent.ts",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@mastra/core": "^1.73.0",
+    "@mastra/mcp": "^2.1.2",
+    "@wave-av/adk": "^1.1.0",
+    "@wave-av/mcp-server": "^0.3.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0",
+    "tsx": "^4.23.0",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  }
+}
