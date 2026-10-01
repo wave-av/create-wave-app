@@ -17,7 +17,7 @@ empty, instead of starting with nothing to do.
 
 ## What it does
 
-- Every 30 seconds (`WAVE_POLL_INTERVAL_MS`), calls
+- Every 30 seconds (`WAVE_POLL_INTERVAL_MS`, at least 1000 ms), calls
   `GET /v1/streams/{streamId}/status` for each stream and logs the status.
 - When a stream drops from `live` to `idle` or `ended`, logs a quality-drop
   alert. With `WAVE_AUTO_REMEDIATE=1` it also calls

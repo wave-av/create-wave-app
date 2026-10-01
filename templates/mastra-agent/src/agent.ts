@@ -17,8 +17,11 @@ import { AgentToolkit, createWaveMCPConfig } from '@wave-av/adk';
 // Load .env when it exists; otherwise use the process environment as is.
 try {
   process.loadEnvFile();
-} catch {
-  // no .env file
+} catch (error) {
+  if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+    console.error(`mastra-agent: could not read .env: ${(error as Error).message}`);
+    process.exit(1);
+  }
 }
 
 function requireEnv(name: string, hint: string): string {
@@ -52,24 +55,27 @@ const waveTools = Object.fromEntries(
 // ─── 2. Optional: the WAVE MCP server ────────────────────────────────────────
 
 const mcp = process.env.WAVE_USE_MCP === '1' ? new MCPClient(createWaveMCPConfig({ apiKey: waveKey })) : null;
-const mcpTools = mcp ? await mcp.listTools() : {};
-
-const agent = new Agent({
-  id: 'wave-stream-agent',
-  name: 'WAVE stream agent',
-  instructions: `You operate live video on WAVE with the tools you are given.
-Check a stream's status before you act on it. When a tool fails, report the
-error code and request id it returned instead of guessing.`,
-  model: 'anthropic/claude-sonnet-4-6',
-  tools: { ...waveTools, ...mcpTools },
-});
 
 const streamId = process.env.WAVE_STREAM_ID?.trim();
 const prompt = streamId
   ? `Check the status of stream ${streamId} and tell me whether it needs attention.`
   : 'List the WAVE tools you can use and what each one does.';
 
+// Everything after the MCP client exists runs inside try, so a failed MCP
+// start-up still disconnects it.
 try {
+  const mcpTools = mcp ? await mcp.listTools() : {};
+
+  const agent = new Agent({
+    id: 'wave-stream-agent',
+    name: 'WAVE stream agent',
+    instructions: `You operate live video on WAVE with the tools you are given.
+Check a stream's status before you act on it. When a tool fails, report the
+error code and request id it returned instead of guessing.`,
+    model: 'anthropic/claude-sonnet-4-6',
+    tools: { ...waveTools, ...mcpTools },
+  });
+
   console.log(`Tools: ${Object.keys(waveTools).length} from the ADK, ${Object.keys(mcpTools).length} from MCP`);
   const result = await agent.generate(prompt);
   console.log(result.text);

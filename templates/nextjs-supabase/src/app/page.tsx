@@ -1,7 +1,8 @@
 import { getSupabase } from '@/lib/supabase';
 import { getWaveStatus } from '@/lib/wave';
 
-// Render on each request: the WAVE status is live, and the build needs no keys.
+// Render on request so the build needs no keys. The WAVE check itself is
+// reused for a minute (src/lib/wave.ts), so visits do not each call WAVE.
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
@@ -21,7 +22,7 @@ export default async function Home() {
           Set <code>WAVE_API_KEY</code> in <code>.env.local</code> to connect.
         </p>
       )}
-      {wave.state === 'connected' && <p>Connected to organization {wave.organizationId}.</p>}
+      {wave.state === 'connected' && <p>Connected: the server&apos;s WAVE key works.</p>}
       {wave.state === 'error' && (
         <p>
           WAVE answered {wave.status ?? 'with an error'} {wave.code ?? ''}: {wave.message}

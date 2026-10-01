@@ -7,16 +7,16 @@
 
 import { AgentRuntime, StreamMonitorAgent, WaveToolError } from '@wave-av/adk';
 
-// Load .env when it exists; otherwise use the process environment as is.
-try {
-  process.loadEnvFile();
-} catch {
-  // no .env file
-}
-
 function fail(message: string): never {
   console.error(`stream-monitor: ${message}`);
   process.exit(1);
+}
+
+// Load .env when it exists; otherwise use the process environment as is.
+try {
+  process.loadEnvFile();
+} catch (error) {
+  if ((error as NodeJS.ErrnoException).code !== 'ENOENT') fail(`could not read .env: ${(error as Error).message}`);
 }
 
 const apiKey = process.env.WAVE_AGENT_KEY?.trim();
@@ -28,11 +28,19 @@ const streamIds = (process.env.WAVE_STREAM_IDS ?? '')
   .filter(Boolean);
 if (streamIds.length === 0) fail('set WAVE_STREAM_IDS to one or more stream ids, separated by commas.');
 
+// Each poll is one API call per stream, so refuse an interval that would hammer the API.
+const MIN_POLL_INTERVAL_MS = 1_000;
+const pollSetting = process.env.WAVE_POLL_INTERVAL_MS?.trim();
+const pollingIntervalMs = pollSetting ? Number(pollSetting) : 30_000;
+if (!Number.isInteger(pollingIntervalMs) || pollingIntervalMs < MIN_POLL_INTERVAL_MS) {
+  fail(`WAVE_POLL_INTERVAL_MS must be a whole number of milliseconds, at least ${MIN_POLL_INTERVAL_MS} (got "${pollSetting}").`);
+}
+
 const agent = new StreamMonitorAgent({
   apiKey,
   agentName: 'my-stream-monitor',
   streamIds,
-  pollingIntervalMs: Number(process.env.WAVE_POLL_INTERVAL_MS ?? 30_000),
+  pollingIntervalMs,
   // When a live stream goes idle or ends, call POST /v1/streams/{id}/start.
   // Off unless you opt in: it changes the stream.
   autoRemediate: process.env.WAVE_AUTO_REMEDIATE === '1',

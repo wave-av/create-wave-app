@@ -17,8 +17,11 @@ A [Next.js](https://nextjs.org) app with the
 ## What you get
 
 - `src/lib/wave.ts`: checks the WAVE connection on the server with a read-only
-  call (`GET /v1/billing/usage`). The home page shows the organization it
-  reached, or the HTTP status, error code and request id when WAVE refuses.
+  call (`GET /v1/billing/usage`) and reuses the answer for a minute, so page
+  views do not each call WAVE. The home page is public, so it shows only
+  whether the key works (or the HTTP status, error code and request id when
+  WAVE refuses), never which account the key belongs to. Put account data
+  behind sign-in.
 - `src/lib/supabase.ts`: a Supabase client built from your public URL and anon
   key. Sign-in is not wired up; add it with Supabase Auth when you need it.
 - `npm run build` needs no keys: the home page renders on each request.
