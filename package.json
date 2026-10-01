@@ -1,0 +1,58 @@
+{
+  "name": "@wave-av/create-app",
+  "version": "1.1.0",
+  "description": "Create a new WAVE streaming app or AI video agent. TypeScript templates with the WAVE ADK pre-installed.",
+  "type": "module",
+  "bin": {
+    "create-wave-app": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "templates",
+    "README.md",
+    "LICENSE",
+    "NOTICE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --target node20 --clean",
+    "type-check": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "prepack": "npm run build"
+  },
+  "keywords": [
+    "wave",
+    "create",
+    "scaffold",
+    "agent",
+    "streaming",
+    "video",
+    "template",
+    "starter",
+    "cli"
+  ],
+  "author": "WAVE Inc. <sdk@wave.online>",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true,
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wave-av/create-wave-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wave-av/create-wave-app/issues"
+  },
+  "homepage": "https://github.com/wave-av/create-wave-app#readme",
+  "engines": {
+    "node": ">=20.12.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.11"
+  }
+}

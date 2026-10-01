@@ -1,0 +1,26 @@
+{
+  "name": "wave-livekit-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/agent.ts dev",
+    "build": "tsup src/agent.ts --format esm --target node20 --clean",
+    "start": "node dist/agent.js start",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@livekit/agents": "^1.9.1",
+    "@wave-av/adk": "^1.1.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0",
+    "tsup": "^8.5.1",
+    "tsx": "^4.23.0",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=20.12.0"
+  }
+}
