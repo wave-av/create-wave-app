@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -92,5 +92,16 @@ describe('scaffolding', () => {
   it('uses stream-monitor by default', () => {
     expect(run(['bot'], deps)).toBe(0);
     expect(readFileSync(join(cwd, 'bot', 'src', 'agent.ts'), 'utf8')).toContain('StreamMonitorAgent');
+  });
+
+  it('removes the half-made project when scaffolding fails, so a retry can use the name', () => {
+    const brokenRoot = join(cwd, 'broken-templates');
+    mkdirSync(join(brokenRoot, 'stream-monitor', 'src'), { recursive: true });
+    writeFileSync(join(brokenRoot, 'stream-monitor', 'src', 'agent.ts'), '// copied before the failure\n');
+    writeFileSync(join(brokenRoot, 'stream-monitor', 'package.json'), '{ not json');
+    expect(run(['app'], { ...deps, templatesRoot: brokenRoot })).toBe(1);
+    expect(err.join('\n')).toContain('Nothing was left behind');
+    expect(existsSync(join(cwd, 'app'))).toBe(false);
+    expect(run(['app'], deps)).toBe(0);
   });
 });

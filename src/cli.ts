@@ -5,7 +5,7 @@
  * writes the new project directory.
  */
 
-import { cpSync, existsSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { DEFAULT_TEMPLATE, TEMPLATES, isTemplate } from './templates';
@@ -58,6 +58,23 @@ export function checkProjectName(name: string): string | null {
     return `Invalid project name "${name}": use letters, digits, ".", "_" or "-", start with a letter or digit, and no path separators.`;
   }
   return null;
+}
+
+/** Copy the template into the (new, empty) target directory and name the package. */
+function scaffold(templateDir: string, targetDir: string, projectName: string): void {
+  cpSync(templateDir, targetDir, { recursive: true, errorOnExist: true, force: false });
+
+  // npm never packs a file named .gitignore, so templates ship their dotfiles
+  // without the dot and get their real names here.
+  for (const [shipped, real] of Object.entries(DOTFILES)) {
+    const from = join(targetDir, shipped);
+    if (existsSync(from)) renameSync(from, join(targetDir, real));
+  }
+
+  const pkgPath = join(targetDir, 'package.json');
+  const pkg = JSON.parse(readFileSync(pkgPath, 'utf8')) as Record<string, unknown>;
+  pkg.name = projectName.toLowerCase();
+  writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
 }
 
 export function run(argv: readonly string[], deps: CliDeps): number {
@@ -116,19 +133,21 @@ export function run(argv: readonly string[], deps: CliDeps): number {
   }
 
   deps.log(`Creating ${projectName} from the ${template} template...`);
-  cpSync(templateDir, targetDir, { recursive: true, errorOnExist: true, force: false });
-
-  // npm never packs a file named .gitignore, so templates ship their dotfiles
-  // without the dot and get their real names here.
-  for (const [shipped, real] of Object.entries(DOTFILES)) {
-    const from = join(targetDir, shipped);
-    if (existsSync(from)) renameSync(from, join(targetDir, real));
+  // mkdir without `recursive` claims the directory: it fails if anything created
+  // it since the check above, so the cleanup below only ever removes our own.
+  try {
+    mkdirSync(targetDir);
+  } catch (err) {
+    deps.error(`Could not create ${targetDir}: ${(err as Error).message}`);
+    return 1;
   }
-
-  const pkgPath = join(targetDir, 'package.json');
-  const pkg = JSON.parse(readFileSync(pkgPath, 'utf8')) as Record<string, unknown>;
-  pkg.name = projectName.toLowerCase();
-  writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
+  try {
+    scaffold(templateDir, targetDir, projectName);
+  } catch (err) {
+    rmSync(targetDir, { recursive: true, force: true });
+    deps.error(`Could not create ${projectName}: ${(err as Error).message}. Nothing was left behind.`);
+    return 1;
+  }
 
   const envExample = ['.env.example', '.env.local.example'].find((f) => existsSync(join(targetDir, f)));
   const steps = [
