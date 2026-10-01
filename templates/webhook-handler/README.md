@@ -1,7 +1,8 @@
 # WAVE webhook handler
 
 A small [Hono](https://hono.dev) server that receives WAVE webhook deliveries,
-checks their signature and handles each event once.
+checks their signature and skips recent duplicates. It logs each event's type
+and id; you add the handling.
 
 ## Setup
 
@@ -34,16 +35,31 @@ Each delivery is a `POST` with these headers:
 | `x-wave-event-type` | the event type, for example `incident.started` |
 | `x-wave-delivery-id` | unique per delivery |
 
-The handler verifies the signature over the raw body before it parses anything
-and answers `401` when it does not match. WAVE delivers at least once and
-retries anything but a `2xx`, so the handler skips a `x-wave-delivery-id` it has
-already handled. The example keeps those ids in memory; keep them in your
-database in production.
+The handler refuses a body over 256 KiB (`413`) while it is still arriving,
+then verifies the signature over the raw body before it parses anything and
+answers `401` when it does not match. It answers `400` when the signed body is
+not a delivery it recognizes, or when `x-wave-event-type` (which the signature
+does not cover) disagrees with the type in the body; it routes on the body.
+
+WAVE delivers at least once and retries anything but a `2xx`, so the handler
+skips a `x-wave-delivery-id` it handled recently. Those ids live in memory: a
+restart, a second instance, or 10,000 newer deliveries forgets one, and a retry
+is then handled again. In production, claim the id in your database (a unique
+key) before any side effect. WAVE does not retry a delivery you answered `2xx`,
+so finish or durably queue your work first.
 
 A full delivery body is `{ "event", "data", "delivered_at" }`. A subscription
-created with `"mode": "thin"` gets `{ "type", "id", "payload_url" }` instead,
-and the event body is fetched from the signed, expiring `payload_url`.
+created with `"mode": "thin"` gets `{ "type", "id", "payload_url",
+"signature_material" }` instead. The event body is at `payload_url`, a signed
+URL that expires. **This template does not fetch it**: it logs the type and id
+and answers `2xx`. Add the fetch (or a durable queue for it) where `server.ts`
+says so before you rely on thin deliveries.
+
+The handler logs event types and ids only. It never logs `data` (it can hold
+customer information) or `payload_url` (anyone holding it can read the event
+until it expires).
 
 ## Test
 
-`npm test` checks the signature code against known-good and tampered inputs.
+`npm test` checks the signature code against known-good and tampered inputs,
+and the delivery parser against malformed bodies.
