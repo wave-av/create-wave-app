@@ -1,0 +1,17 @@
+{
+  "name": "electron",
+  "description": "Hardened Electron shell (frameless window + loopback server + auto-update) from the proven Lighthouse path.",
+  "params": [
+    { "token": "__APP_SLUG__", "flag": "name (positional)", "example": "sample-desk" },
+    { "token": "__APP_NAME__", "flag": "--app-name", "example": "Sample Desk" },
+    { "token": "__APP_ID__", "flag": "--app-id", "example": "online.wave.sample-desk" },
+    { "token": "__APP_VERSION__", "flag": "--app-version", "example": "0.1.0" },
+    { "token": "__FEED_URL__", "flag": "--feed-url", "example": "https://updates.wave.online/sample-desk" },
+    { "token": "__PORT__", "flag": "--port", "example": "7727" },
+    { "token": "__PORT_ENV__", "flag": "derived", "example": "SAMPLE_DESK_PORT" },
+    { "token": "__BRIDGE__", "flag": "derived", "example": "sampleDesk" },
+    { "token": "__IPC__", "flag": "derived (= slug)", "example": "sample-desk" },
+    { "token": "__SERVER_ENTRY__", "flag": "--server-entry", "example": ".config/sample-desk/server.mjs" }
+  ],
+  "binary": ["build/icon.icns", "build/icon.png"]
+}

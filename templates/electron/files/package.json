@@ -1,0 +1,50 @@
+{
+  "name": "__APP_SLUG__",
+  "version": "__APP_VERSION__",
+  "private": true,
+  "description": "__APP_NAME__ — native shell for the __APP_NAME__ desk service. Connects to the local service; no URL typing.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --mac",
+    "test": "node --test \"test/*.test.mjs\"",
+    "smoke": "./scripts/smoke.sh",
+    "cold-boot": "./scripts/cold-boot.sh",
+    "brand-proof": "./scripts/brand-proof.sh"
+  },
+  "dependencies": {
+    "electron-updater": "^6.0.0"
+  },
+  "devDependencies": {
+    "electron": "^39.8.10",
+    "electron-builder": "^26.8.1"
+  },
+  "build": {
+    "appId": "__APP_ID__",
+    "productName": "__APP_NAME__",
+    "copyright": "Copyright © 2026 WAVE Online LLC",
+    "directories": { "output": "dist" },
+    "files": ["main.js", "preload.js", "updater.js", "rollout-guard.js", "package.json"],
+    "mac": {
+      "target": [
+        { "target": "dmg", "arch": ["arm64"] },
+        { "target": "zip", "arch": ["arm64"] }
+      ],
+      "category": "public.app-category.productivity",
+      "icon": "build/icon.icns",
+      "hardenedRuntime": true,
+      "entitlements": "entitlements.mac.plist",
+      "entitlementsInherit": "entitlements.mac.plist",
+      "notarize": true
+    },
+    "dmg": {
+      "title": "__APP_NAME__",
+      "window": { "width": 540, "height": 380 }
+    },
+    "publish": {
+      "provider": "generic",
+      "url": "__FEED_URL__",
+      "channel": "latest"
+    }
+  }
+}
