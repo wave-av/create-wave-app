@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- Hardened-runtime entitlements for __APP_NAME__ (applied at sign time;
+       local `npm run dist` builds unsigned — see README.md). Minimal set
+       Electron/Chromium needs: JIT for V8, unsigned executable memory for
+       the renderer, and library-validation exemption for the bundled
+       frameworks. No app-sandbox, no network/device entitlements: the desk
+       page talks to the loopback desk service over plain HTTP. -->
+  <key>com.apple.security.cs.allow-jit</key>
+  <true/>
+  <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+  <true/>
+  <key>com.apple.security.cs.disable-library-validation</key>
+  <true/>
+</dict>
+</plist>

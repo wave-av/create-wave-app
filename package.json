@@ -1,0 +1,14 @@
+{
+  "name": "@wave-av/create-app",
+  "version": "0.3.0",
+  "description": "Scaffold a new WAVE agent or streaming app in seconds.",
+  "license": "MIT",
+  "type": "commonjs",
+  "bin": {
+    "create-wave-app": "bin/create-wave-app.mjs"
+  },
+  "files": ["bin/", "templates/"],
+  "scripts": {
+    "test": "node --test \"test/*.test.mjs\""
+  }
+}
