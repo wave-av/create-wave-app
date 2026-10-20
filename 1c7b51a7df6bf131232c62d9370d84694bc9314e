@@ -1,0 +1,39 @@
+tsconfig.json
+  s_13ccc7d9001218::t_d67602434f668f 1-14
+.gitignore
+  s_13ccc7d9001218::t_eb4d521b540a43 1-4
+src/cli.ts
+  s_13ccc7d9001218::t_7fd2e47278bb1e 121-126
+  s_13ccc7d9001218::t_362ba1b784bc1b 1-19,27-120,127-142
+  s_13ccc7d9001218::t_f764a6992b0d5f 20-26
+src/__tests__/templates.test.ts
+  s_13ccc7d9001218::t_3f3d5bc71ac55d 1-98
+vitest.config.ts
+  s_13ccc7d9001218::t_00148cd7b15d69 1-6
+src/templates.ts
+  s_13ccc7d9001218::t_efd2585a2b4203 1-14
+src/__tests__/cli.test.ts
+  s_13ccc7d9001218::t_b61dd7cddfed38 1-96
+src/index.ts
+  s_13ccc7d9001218::t_dd030a1148d70e 1-13
+package.json
+  s_13ccc7d9001218::t_28ad0fafa9f668 1-58
+package-lock.json
+  s_13ccc7d9001218::t_7d34c4996338e3 1-2662
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "1c7b51a7df6bf131232c62d9370d84694bc9314e",
+  "prompts": {},
+  "sessions": {
+    "s_13ccc7d9001218": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "11229abc-f617-4541-b5d7-d693c6ae4d9d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jake Fineman <jakefineman@gmail.com>"
+    }
+  }
+}
