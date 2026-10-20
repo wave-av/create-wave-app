@@ -1,0 +1,24 @@
+.buildkite/pipeline.yml
+  h_af5ac1a9798224 5-7,9-13,15-42
+.buildkite/scripts/guard-content-policy.sh
+  h_af5ac1a9798224 1-31
+.buildkite/scripts/guard-gitleaks.sh
+  h_af5ac1a9798224 1-24
+.buildkite/tests/README.md
+  h_af5ac1a9798224 1-14
+.buildkite/tests/guard-content-policy-fork.bats
+  h_af5ac1a9798224 1-70
+.buildkite/tests/pipeline-gating.py
+  h_af5ac1a9798224 1-189
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "54cb3249c49797cad21eac84c190bd755762b580",
+  "prompts": {},
+  "humans": {
+    "h_af5ac1a9798224": {
+      "author": "Jake Fineman <jakefineman@gmail.com>"
+    }
+  }
+}
