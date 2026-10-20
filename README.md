@@ -18,6 +18,9 @@
 npx @wave-av/create-app my-stream-bot
 ```
 
+Always run the scoped package, `@wave-av/create-app`. The unscoped
+`create-wave-app` package on npm is not published by WAVE.
+
 With a specific template:
 
 ```bash
