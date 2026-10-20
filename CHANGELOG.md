@@ -5,6 +5,19 @@ All notable changes to this project are documented here. The format is based on
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+
+- `--help` now prints full usage for the scoped `npx @wave-av/create-app`
+  command, including every template and flag; the unscoped
+  `create-wave-app` name is never suggested.
+- Template names must match a shipped template, so `--template ../...`
+  can no longer escape the templates directory.
+- A failed scaffold removes the half-made project directory instead of
+  leaving it behind.
+- The `electron` template's ignore file now survives `npm pack` (shipped
+  as `gitignore`, renamed to `.gitignore` on scaffold), so scaffolded
+  apps ignore `node_modules/` out of the box.
+
 ### Added
 
 - `electron` template: hardened Electron shell from the proven Lighthouse
