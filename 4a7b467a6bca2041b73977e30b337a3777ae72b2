@@ -1,0 +1,24 @@
+.github/workflows/test.yml
+  s_13ccc7d9001218::t_2543d6a1c516c0 7-13
+  s_13ccc7d9001218::t_0b9930cb393750 73-75,82-85
+.github/workflows/release.yml
+  s_13ccc7d9001218::t_fcd1a9497215b5 29-37,47-54,56
+package.json
+  s_13ccc7d9001218::t_964c52c9f86ce0 21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "4a7b467a6bca2041b73977e30b337a3777ae72b2",
+  "prompts": {},
+  "sessions": {
+    "s_13ccc7d9001218": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "11229abc-f617-4541-b5d7-d693c6ae4d9d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jake Fineman <jakefineman@gmail.com>"
+    }
+  }
+}

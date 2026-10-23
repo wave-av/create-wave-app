@@ -1,0 +1,28 @@
+.contracts-absent.json
+  h_af5ac1a9798224 3
+.gitignore
+  h_af5ac1a9798224 1-4
+CHANGELOG.md
+  h_af5ac1a9798224 8-20
+README.md
+  h_af5ac1a9798224 21-23
+TESTING.md
+  h_af5ac1a9798224 1-35
+bin/create-wave-app.mjs
+  h_af5ac1a9798224 4,6-8,15-25,34-81,88-93,112,115-121,145,148-172,174-176,185-192,195
+test/cli.test.mjs
+  h_af5ac1a9798224 1-131
+test/scaffold.test.mjs
+  h_af5ac1a9798224 28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "1b8d9c329f676ee8bb2808d0568e7f39862e2a0f",
+  "prompts": {},
+  "humans": {
+    "h_af5ac1a9798224": {
+      "author": "Jake Fineman <jakefineman@gmail.com>"
+    }
+  }
+}
