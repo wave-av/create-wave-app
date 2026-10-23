@@ -1,12 +1,12 @@
 <div align="center">
 
-# create-wave-app
+# create-wave-app <!-- # guard:allow public template own-name self-reference (hyphen-boundary FP; see WAVE-27328) -->
 
 **Scaffold a new WAVE agent or streaming app from one of 6 starter templates — published as the `@wave-av/create-app` npm package.**
 
 ![kind](https://img.shields.io/badge/kind-cli--scaffolder-555?style=flat-square) ![domain](https://img.shields.io/badge/domain-developer--tools-0a7?style=flat-square) ![lang](https://img.shields.io/badge/lang-TypeScript-3178c6?style=flat-square) ![visibility](https://img.shields.io/badge/visibility-public-brightgreen?style=flat-square) ![license](https://img.shields.io/badge/license-MIT-blue?style=flat-square)
 
-[npm](https://www.npmjs.com/package/@wave-av/create-app) · [wave.online](https://wave.online) · [github](https://github.com/wave-av/create-wave-app) · [Docs](https://docs.wave.online)
+[npm](https://www.npmjs.com/package/@wave-av/create-app) · [wave.online](https://wave.online) · [github](https://github.com/wave-av/create-wave-app) · [Docs](https://docs.wave.online) <!-- # guard:allow public template own-name self-reference (hyphen-boundary FP; see WAVE-27328) -->
 
 </div>
 
@@ -19,7 +19,7 @@ npx @wave-av/create-app my-stream-bot
 ```
 
 Always run the scoped package, `@wave-av/create-app`. The unscoped
-`create-wave-app` package on npm is not published by WAVE.
+`create-wave-app` package on npm is not published by WAVE. <!-- # guard:allow public template own-name self-reference (hyphen-boundary FP; see WAVE-27328) -->
 
 With a specific template:
 
@@ -65,10 +65,10 @@ pre-wired, and an `.env.example` for the credentials it needs (most agent templa
 
 ## About this repo
 
-`create-wave-app` (npm: `@wave-av/create-app`, CLI binary: `create-wave-app`) is published from WAVE's
+`create-wave-app` (npm: `@wave-av/create-app`, CLI binary: `create-wave-app`) is published from WAVE's <!-- # guard:allow public template own-name self-reference (hyphen-boundary FP; see WAVE-27328) -->
 internal monorepo. This public repo carries the project's governance surface — `CHANGELOG.md`,
 `SECURITY.md`, `AGENTS.md`, and `capabilities.json` (currently `beta`, v0.2.0) — as the canonical public
-record for the package, plus the in-repo CLI (`bin/create-wave-app.mjs`) and the `electron` template.
+record for the package, plus the in-repo CLI (`bin/create-wave-app.mjs`) and the `electron` template. <!-- # guard:allow public template own-name self-reference (hyphen-boundary FP; see WAVE-27328) -->
 
 ## Related packages
 

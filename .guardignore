@@ -1,0 +1,17 @@
+# Per-file carve-outs: paths the private-repo rule flags that cannot take
+# inline `# guard:allow` markers (see reason per entry). The gitleaks gate
+# still scans these files. Globs (not literals) where the filename itself
+# contains the term — the guard scans this file too. Re-check if guard terms
+# are ever scoped (WAVE-27328).
+# AGENTS.md: machine-surface fence must stay byte-exact (hyphen-boundary FP).
+AGENTS.md
+# capabilities.json: own public name self-references; json takes no markers.
+capabilities.json
+# package.json: own public name self-references; json takes no markers.
+package.json
+# bin/*.mjs: own public name in JS code (no # comments available).
+bin/*.mjs
+# test/*.mjs: own public name in JS code (no # comments available).
+test/*.mjs
+# provenance schema: $id must name its home repo (own public name).
+.buildkite/provenance/schema/provenance.schema.json
