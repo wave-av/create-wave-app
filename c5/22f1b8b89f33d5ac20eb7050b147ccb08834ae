@@ -1,0 +1,46 @@
+.buildkite/pipeline.yml
+  h_af5ac1a9798224 3,18,36,46,57,68,79,95
+.buildkite/provenance/VERSION
+  h_af5ac1a9798224 2,10,12
+.buildkite/provenance/schema/provenance.schema.json
+  h_af5ac1a9798224 3
+.buildkite/scripts/foundation-secret-scan.sh
+  h_af5ac1a9798224 4
+.buildkite/scripts/foundation-skill-validate.sh
+  h_af5ac1a9798224 4
+.buildkite/scripts/guard-content-policy.sh
+  h_af5ac1a9798224 19-27
+.buildkite/tests/guard-content-policy-fork.bats
+  h_af5ac1a9798224 110-145
+.buildkite/tests/pipeline-gating.py
+  h_af5ac1a9798224 9,93-94,129,172
+.buildkite/upload.sh
+  h_af5ac1a9798224 2
+.github/workflows/_checks.yml
+  h_af5ac1a9798224 3,5,50
+.github/workflows/foundation-gate.yml
+  h_af5ac1a9798224 3,7
+.github/workflows/governance-enforce.yml
+  h_af5ac1a9798224 8,14,90
+.github/workflows/issue-ops-triage.yml
+  h_af5ac1a9798224 14,19
+.guardignore
+  h_af5ac1a9798224 1-17
+CHANGELOG.md
+  h_af5ac1a9798224 12,27
+README.md
+  h_af5ac1a9798224 3,9,22,68,71
+scripts/public-repo-guard/content-policy.sh
+  h_af5ac1a9798224 103,106,112-115
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "c522f1b8b89f33d5ac20eb7050b147ccb08834ae",
+  "prompts": {},
+  "humans": {
+    "h_af5ac1a9798224": {
+      "author": "Jake Fineman <jakefineman@gmail.com>"
+    }
+  }
+}
