@@ -87,3 +87,15 @@ MIT — see [LICENSE](LICENSE) and [NOTICE](NOTICE).
 
 <!-- wave-standard-footer -->
 <sub><b><a href="https://wave.online">wave.online</a></b> &nbsp;·&nbsp; <a href="https://docs.wave.online">Docs</a> &nbsp;·&nbsp; <a href="https://developer.wave.online">Developers</a></sub>
+## Buildkite runbook
+
+`guard-content-policy` refuses fork PRs (`BUILDKITE_PULL_REQUEST_REPO !=
+BUILDKITE_REPO`) because secrets-queue steps consume host credentials.
+Trusted re-run procedure for a fork PR: run the pipeline from the
+trusted base ref (a base-branch build) — never by re-running the fork
+build itself. A re-run of the fork build keeps fork metadata
+(`BUILDKITE_PULL_REQUEST_REPO` still points at the fork), so the guard
+still refuses it; only a build whose head is the trusted base proceeds.
+The host withholds secret injection from any fork build, and a manual
+approval gate is required before any trusted re-run. Never approve a
+re-run that executes PR-head code with host credentials.
