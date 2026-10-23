@@ -5,13 +5,13 @@ name: governance-enforce
 # violations without failing on legacy debt. Isolated install bypasses any min-release-age policy.
 # The org ruleset `governance-a-block-enforce` requires this job's `enforce` check.
 #
-# VENDORED 2026-08-05 (claude-workstation#1624, E4 T4.9a). This repo was never in that ruleset's
+# VENDORED 2026-08-05 (claude-workstation#1624, E4 T4.9a). This repo was never in that ruleset's  # guard:allow vendoring/fleet-repo provenance mention (verified-safe reference)
 # include list, because the list is 112 hand-maintained names and every one of them matches
 # `wave-*`. A naming convention had silently become a security boundary: the repos that publish
 # our npm packages — cli, sdk, adk, mcp-server, workflow-sdk — were the ones running with no
 # A_BLOCK secrets scan at all.
 #
-# HARDENED 2026-08-05 (claude-workstation#1747), before any of the fan-out merged. The copy first
+# HARDENED 2026-08-05 (claude-workstation#1747), before any of the fan-out merged. The copy first  # guard:allow vendoring/fleet-repo provenance mention (verified-safe reference)
 # vendored here could report PASS having examined nothing. Five fixes, each marked at its site
 # below. A gate may not return a passing value for input it did not examine.
 #
@@ -87,7 +87,7 @@ jobs:
           # `HEAD~1` is the obvious replacement and is ALSO wrong — it scans exactly one commit,
           # so a five-commit push whose base is indeterminate would examine the last one and
           # report a confident pass on the other four. A narrowed scan reported as a full pass is
-          # the same defect in a quieter costume. (This is wave-av/wave-rig's reasoning, already
+          # the same defect in a quieter costume. (This is wave-av/wave-rig's reasoning, already  # guard:allow attributes prior art (verified-safe comment)
           # correct on its main; the fan-out copied the broken shape from elsewhere.)
           #
           # A base can also be PRESENT and still unusable: a force-push leaves

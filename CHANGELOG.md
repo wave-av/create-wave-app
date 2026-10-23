@@ -9,7 +9,7 @@ All notable changes to this project are documented here. The format is based on
 
 - `--help` now prints full usage for the scoped `npx @wave-av/create-app`
   command, including every template and flag; the unscoped
-  `create-wave-app` name is never suggested.
+  `create-wave-app` name is never suggested. <!-- # guard:allow public template own-name self-reference (hyphen-boundary FP; see WAVE-27328) -->
 - Template names must match a shipped template, so `--template ../...`
   can no longer escape the templates directory.
 - A failed scaffold removes the half-made project directory instead of
@@ -24,7 +24,7 @@ All notable changes to this project are documented here. The format is based on
   path (preload zero-node, dmg+zip arm64, hardened runtime, icon slots,
   signing/notarize config, updater + rollout-guard wiring, smoke/cold-boot/
   brand proof scripts, dist-slice contract tests), parameterized per app.
-- `bin/create-wave-app.mjs` scaffolder CLI (`@wave-av/create-app` 0.3.0).
+- `bin/create-wave-app.mjs` scaffolder CLI (`@wave-av/create-app` 0.3.0). <!-- # guard:allow public template own-name self-reference (hyphen-boundary FP; see WAVE-27328) -->
 
 ### Documentation
 
