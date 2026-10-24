@@ -30,10 +30,13 @@ Before writing anything, apply these rules:
    developer and contain only what an outside developer should know. Ask: would this sentence
    mean anything to someone who has never seen the private side of this project?
 
-2. **No internal identifiers.** Never paste an internal ticket or tracking code, a decision
-   record id, a gate or scorecard name, an internal workstream or plan id, or a reference to an
-   internal build or process-automation tool. Describe the user-facing change (for example,
-   "fix canary marker matching"), never the internal ticket that asked for it.
+2. **Opaque identifiers only.** Ticket/tracking codes (e.g. WAVE-xxx), gate names, and
+   plan ids may appear ONLY as bare opaque references — no titles, no status, no
+   rationale quoted from the private side — and ONLY where load-bearing: ordering
+   or provenance comments that cite the deciding record, and pipeline routing keys
+   (Buildkite queue names) that cannot function without them. Prefer describing the
+   user-facing change ("fix canary marker matching"); reach for an identifier only
+   when removing it loses meaning or breaks the build. (Ruling WAVE-27334.)
 
 3. **No internal topology.** Never name a private repository, an internal hostname or
    subdomain, a staging/dev/preview environment, an internal tool, or an internal document
