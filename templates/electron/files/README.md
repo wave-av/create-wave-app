@@ -28,6 +28,10 @@ Wave Desk dist slice).
   `scripts/cold-boot.sh`, `scripts/brand-proof.sh` — proofs (below).
 - `test/dist-slice.test.mjs`, `test/rollout-guard.test.mjs` — contract
   tests (`npm test`).
+- `.entire/settings.json` — Entire checkpoints on local git-refs;
+  sessions never push to Entire cloud (`push_sessions: false`). Wire the
+  agent hooks with `entire enable`; local-only overrides belong in
+  `.entire/settings.local.json` (git-ignored).
 
 ## Build
 

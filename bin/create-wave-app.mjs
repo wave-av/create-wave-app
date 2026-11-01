@@ -16,11 +16,12 @@ const TEMPLATES = path.join(HERE, "..", "templates");
 export const RUN_COMMAND = "npx @wave-av/create-app";
 export const DEFAULT_TEMPLATE = "electron";
 
-/** Files a template ships without their leading dot, and the name each gets in the new project. */
+/** Files/dirs a template ships without their leading dot, and the name each gets in the new project. */
 export const DOTFILES = {
   gitignore: ".gitignore",
   "env.example": ".env.example",
   "env.local.example": ".env.local.example",
+  entire: ".entire",
 };
 
 const slugify = (s) =>
