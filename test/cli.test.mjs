@@ -128,4 +128,6 @@ test("packed tarball ships the dotfile source (npm strips .gitignore)", (t) => {
   const paths = JSON.parse(out)[0].files.map((f) => f.path);
   assert.ok(paths.includes("templates/electron/files/gitignore"), "tarball ships templates/electron/files/gitignore");
   assert.ok(!paths.some((p) => p.endsWith("/.gitignore")), "tarball has no literal .gitignore (npm strips those)");
+  assert.ok(paths.includes("templates/electron/files/entire/settings.json"), "tarball ships the Entire settings scaffold");
+  assert.ok(!paths.some((p) => p.includes("/.entire/")), "tarball has no literal .entire/ (shipped dotless, renamed at scaffold)");
 });
