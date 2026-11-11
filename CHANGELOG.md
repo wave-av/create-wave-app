@@ -7,6 +7,10 @@ All notable changes to this project are documented here. The format is based on
 ## [Unreleased]
 ### Fixed
 
+- Electron template: the desk window stays on the local loopback origin.
+  Navigation, redirects, and `window.open` to anywhere else are denied, and
+  preload IPC is ignored unless the sender is that origin.
+
 - `--help` now prints full usage for the scoped `npx @wave-av/create-app`
   command, including every template and flag; the unscoped
   `create-wave-app` name is never suggested. <!-- # guard:allow public template own-name self-reference (hyphen-boundary FP; see WAVE-27328) -->

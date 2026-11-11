@@ -14,9 +14,16 @@ const FEED_URL = "__FEED_URL__";
 let status = { state: "idle", version: null, error: null };
 const snapshot = () => ({ ...status, feed: FEED_URL });
 
-function initIpc(app) {
-  ipcMain.handle("__IPC__:update-status", () => snapshot());
-  ipcMain.handle("__IPC__:check-for-updates", async () => {
+function initIpc(app, { assertSender } = {}) {
+  if (typeof assertSender !== "function") {
+    throw new Error("updater.initIpc requires assertSender");
+  }
+  ipcMain.handle("__IPC__:update-status", (event) => {
+    assertSender(event);
+    return snapshot();
+  });
+  ipcMain.handle("__IPC__:check-for-updates", async (event) => {
+    assertSender(event);
     await check(app);
     return snapshot();
   });

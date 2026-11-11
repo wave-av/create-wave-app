@@ -25,7 +25,7 @@ function scaffoldedApp() {
 test("cli scaffolds a complete electron app with no leftover tokens", () => {
   const app = scaffoldedApp();
   try {
-    for (const f of ["package.json", "main.js", "preload.js", "updater.js", "rollout-guard.js", "entitlements.mac.plist", "README.md", ".gitignore", ".entire/settings.json", "build/icon.icns", "build/icon.png", "scripts/smoke.sh", "scripts/cold-boot.sh", "scripts/brand-proof.sh", "scripts/scratch-server.mjs", "test/dist-slice.test.mjs", "test/rollout-guard.test.mjs"]) {
+    for (const f of ["package.json", "main.js", "preload.js", "updater.js", "rollout-guard.js", "desk-origin.js", "entitlements.mac.plist", "README.md", ".gitignore", ".entire/settings.json", "build/icon.icns", "build/icon.png", "scripts/smoke.sh", "scripts/cold-boot.sh", "scripts/brand-proof.sh", "scripts/scratch-server.mjs", "test/dist-slice.test.mjs", "test/rollout-guard.test.mjs", "test/desk-origin.test.mjs"]) {
       assert.ok(existsSync(path.join(app, f)), `scaffolded file exists: ${f}`);
     }
     assert.ok(!existsSync(path.join(app, "entire")), "shipped entire/ dir renamed to .entire/");

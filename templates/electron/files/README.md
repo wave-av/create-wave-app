@@ -11,7 +11,9 @@ Wave Desk dist slice).
 
 - `main.js` — BrowserWindow (frameless) + menu. Hardened
   `webPreferences`: `preload`, `nodeIntegration:false`,
-  `contextIsolation:true`, `sandbox:true`.
+  `contextIsolation:true`, `sandbox:true`. Navigation and new
+  windows stay on `http://127.0.0.1:<port>/`; IPC requires that origin.
+- `desk-origin.js` — loopback URL allowlist used by main and updater.
 - `preload.js` — the only bridge:
   `window.__BRIDGE__.{getVersion,openExternal,getUpdateStatus,checkForUpdates}`
   over validated ipc channels. Zero node exposure (no `process`/`require`/
