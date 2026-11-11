@@ -24,7 +24,7 @@
     "productName": "__APP_NAME__",
     "copyright": "Copyright © 2026 WAVE Online LLC",
     "directories": { "output": "dist" },
-    "files": ["main.js", "preload.js", "updater.js", "rollout-guard.js", "package.json"],
+    "files": ["main.js", "preload.js", "updater.js", "rollout-guard.js", "desk-origin.js", "package.json"],
     "mac": {
       "target": [
         { "target": "dmg", "arch": ["arm64"] },

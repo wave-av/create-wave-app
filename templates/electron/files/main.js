@@ -9,6 +9,7 @@
 const { app, BrowserWindow, Menu, ipcMain, shell } = require("electron");
 const { spawn } = require("node:child_process");
 const path = require("node:path");
+const { isDeskUrl } = require("./desk-origin");
 const updater = require("./updater");
 
 const PORT = Number(process.env.__PORT_ENV__) || __PORT__;
@@ -61,9 +62,34 @@ function buildMenu() {
   ]));
 }
 
+function assertDeskSender(event) {
+  const url = event && event.senderFrame && event.senderFrame.url;
+  if (!isDeskUrl(url, PORT)) {
+    throw new Error("refused: sender is not the desk origin");
+  }
+}
+
+function lockWebContents(contents) {
+  contents.on("will-navigate", (event, url) => {
+    if (!isDeskUrl(url, PORT)) event.preventDefault();
+  });
+  contents.on("will-redirect", (event, url) => {
+    if (!isDeskUrl(url, PORT)) event.preventDefault();
+  });
+  contents.setWindowOpenHandler(() => ({ action: "deny" }));
+}
+
+app.on("web-contents-created", (_event, contents) => {
+  lockWebContents(contents);
+});
+
 function registerPreloadChannels() {
-  ipcMain.handle("__IPC__:version", () => app.getVersion());
-  ipcMain.handle("__IPC__:open-external", (_event, url) => {
+  ipcMain.handle("__IPC__:version", (event) => {
+    assertDeskSender(event);
+    return app.getVersion();
+  });
+  ipcMain.handle("__IPC__:open-external", (event, url) => {
+    assertDeskSender(event);
     let parsed;
     try {
       parsed = new URL(String(url));
@@ -73,7 +99,7 @@ function registerPreloadChannels() {
     if (parsed.protocol !== "https:") throw new Error("__IPC__:open-external refused: https only");
     return shell.openExternal(parsed.toString());
   });
-  updater.initIpc(app);
+  updater.initIpc(app, { assertSender: assertDeskSender });
 }
 
 function createWindow() {

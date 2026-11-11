@@ -44,10 +44,21 @@ test("main.js wires preload with hardened webPreferences", () => {
   assert.match(src, /https:/, "openExternal must be https-gated");
 });
 
+test("main.js keeps the window on the loopback desk origin", () => {
+  const src = read("main.js");
+  assert.match(src, /require\("\.\/desk-origin"\)/, "main uses the desk-origin allowlist");
+  assert.match(src, /web-contents-created/);
+  assert.match(src, /will-navigate/);
+  assert.match(src, /will-redirect/);
+  assert.match(src, /setWindowOpenHandler/);
+  assert.match(src, /senderFrame/);
+  assert.match(src, /assertSender:\s*assertDeskSender/);
+});
+
 test("main.js gates background update checks to packaged interactive runs", () => {
   const src = read("main.js");
   assert.match(src, /require\("\.\/updater"\)/, "main requires ./updater");
-  assert.match(src, /updater\.initIpc\(app\)/, "ipc channels registered on every boot");
+  assert.match(src, /updater\.initIpc\(app,\s*\{\s*assertSender:\s*assertDeskSender\s*\}\)/, "ipc channels registered on every boot with a sender guard");
   assert.match(src, /app\.isPackaged && !SMOKE/, "background checks only when packaged and not smoking");
 });
 
@@ -55,7 +66,7 @@ test("electron-builder config targets dmg+zip arm64", () => {
   const mac = pkg.build.mac;
   const targets = mac.target.map((t) => `${t.target}:${(t.arch || []).join(",")}`).sort();
   assert.deepEqual(targets, ["dmg:arm64", "zip:arm64"]);
-  assert.deepEqual(pkg.build.files, ["main.js", "preload.js", "updater.js", "rollout-guard.js", "package.json"]);
+  assert.deepEqual(pkg.build.files, ["main.js", "preload.js", "updater.js", "rollout-guard.js", "desk-origin.js", "package.json"]);
 });
 
 test("hardened-runtime signing config present", () => {
@@ -90,6 +101,7 @@ test("update feed is a parameterized https generic publish target", () => {
   assert.match(updaterSrc, /autoDownload = false/, "no silent auto-download");
   assert.match(updaterSrc, /__IPC__:update-status/);
   assert.match(updaterSrc, /__IPC__:check-for-updates/);
+  assert.match(updaterSrc, /requires assertSender/, "update IPC refuses to register without a sender guard");
 });
 
 test("app identity is fully parameterized", () => {
@@ -98,7 +110,7 @@ test("app identity is fully parameterized", () => {
   assert.equal(pkg.build.appId, "__APP_ID__");
   assert.equal(pkg.build.productName, "__APP_NAME__");
   assert.equal(pkg.build.dmg.title, "__APP_NAME__");
-  for (const f of ["package.json", "main.js", "preload.js", "updater.js", "rollout-guard.js", "entitlements.mac.plist", "README.md", "scripts/smoke.sh", "scripts/cold-boot.sh", "scripts/brand-proof.sh", "scripts/scratch-server.mjs"]) {
+  for (const f of ["package.json", "main.js", "preload.js", "updater.js", "rollout-guard.js", "desk-origin.js", "entitlements.mac.plist", "README.md", "scripts/smoke.sh", "scripts/cold-boot.sh", "scripts/brand-proof.sh", "scripts/scratch-server.mjs"]) {
     assert.doesNotMatch(read(f), /__[A-Z_]+__/, `${f} must contain no unsubstituted tokens`);
   }
 });
