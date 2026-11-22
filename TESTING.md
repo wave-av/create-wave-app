@@ -33,3 +33,6 @@ receipt:
 - `test/scaffold.test.mjs`: scaffolding the `electron` template yields a
   complete sample app with no leftover tokens, and the sample app passes
   its own contract tests.
+- `scripts/public-repo-guard/content-policy.test.sh`: content-policy still
+  blocks synthetic leak fixtures when `.rgignore` or `.ignore` would have
+  hidden them, and `.guardignore` still excludes a named path.
