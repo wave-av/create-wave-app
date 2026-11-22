@@ -7,6 +7,10 @@ All notable changes to this project are documented here. The format is based on
 ## [Unreleased]
 ### Fixed
 
+- Content-policy scan no longer honors `.rgignore` / `.ignore`, so a pull
+  request cannot skip the leak gate by ignoring the whole tree. Path
+  exclusions stay the script's built-in globs and `.guardignore`.
+
 - `--help` now prints full usage for the scoped `npx @wave-av/create-app`
   command, including every template and flag; the unscoped
   `create-wave-app` name is never suggested. <!-- # guard:allow public template own-name self-reference (hyphen-boundary FP; see WAVE-27328) -->

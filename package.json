@@ -9,6 +9,6 @@
   },
   "files": ["bin/", "templates/"],
   "scripts": {
-    "test": "node --test \"test/*.test.mjs\""
+    "test": "node --test \"test/*.test.mjs\" && bash scripts/public-repo-guard/content-policy.test.sh"
   }
 }

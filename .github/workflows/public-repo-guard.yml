@@ -148,6 +148,9 @@ jobs:
       # leak gate that blocks legitimate cross-repo references gets switched off,
       # and then it protects nothing. Runs here so a regression is caught by CI
       # rather than by a leak.
+      - name: content policy self-test (fixtures)
+        run: bash scripts/public-repo-guard/content-policy.test.sh
+
       - name: body policy self-test (fixtures)
         run: bash scripts/public-repo-guard/tests/body-policy.test.sh
 
